@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+	<title>Chrome ESLint</title>
+	<style>
+	body {
+		font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
+		font-size: 100%;
+	}
+	.scrolling-code {
+		display: block;
+		white-space: pre;
+		max-height: 50vh;
+		overflow: scroll;
+	}
+	.hidden {
+		display: none;
+	}
+	</style>
+
+	<!-- Escodegen must be loaded before require.js. It has been built with "CommonJS Everywhere" and will not execute properly if require is defined. -->
+	<script src="../libs/escodegen.browser.js"></script>
+	<!-- Require.js is required to load ESLint. ESLint has been built with Browserify. -->
+	<script src="../libs/require.js"></script>
+	<script src="script.js"></script>
+</head>
+<body>
+	<div id="result"></div>
+</body>
+</html>

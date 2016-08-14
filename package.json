@@ -1,0 +1,7 @@
+{
+  "name": "chrome-eslint",
+  "version": "0.1.0",
+  "description": "Chrome extension to run ESLint on the current webpage",
+  "author": "Keegan Street",
+  "license": "MIT"
+}
