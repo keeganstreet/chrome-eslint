@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				isLinting = true;
 				nextScript = lintStack.shift();
+				nextScript.$div.textContent = 'Linting script...';
 				webWorker = new Worker('eslint-web-worker.js');
 
 				webWorker.addEventListener('message', function(e) {
@@ -120,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			$h2.textContent = script.file || 'Inline script';
 			$content.appendChild($h2);
 			var $div = document.createElement('div');
-			$div.textContent = 'Linting...';
+			$div.textContent = (script.file ? 'Loading script...' : 'Waiting for Web Worker...');
 			$content.appendChild($div);
 			script.$div = $div;
 
@@ -128,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				loadScript(script.file).then(function(data) {
 					script.code = data;
 					lintStack.push(script);
+					$div.textContent = 'Waiting for Web Worker...';
 					lintNextItemOnStack();
 				});
 			} else {
