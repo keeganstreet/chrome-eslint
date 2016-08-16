@@ -16,7 +16,8 @@ var loadScript = function(file) {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-	var $content = document.createElement('div');
+	var $content = document.createDocumentFragment();
+
 	document.getElementById('configure').addEventListener('click', function(e) {
 		e.preventDefault();
 		chrome.runtime.openOptionsPage();
@@ -77,59 +78,98 @@ document.addEventListener('DOMContentLoaded', function() {
 			renderResults = function(script) {
 				script.$div.textContent = '';
 
-				if (!script.file) {
-					var $inline = document.createElement('div'),
-						$inlineLink = document.createElement('a'),
-						$inlineLink2 = document.createElement('a'),
-						$inlineCode = document.createElement('code'),
-						$inlineCode2 = document.createElement('code'),
-						createClickListener = function($link, $code) {
-							$link.addEventListener('click', function(e) {
-								e.preventDefault();
-								if ($code.getAttribute('class').indexOf('hidden') === -1) {
-									$code.setAttribute('class', 'scrolling-code hidden');
-								} else {
-									$code.setAttribute('class', 'scrolling-code');
-								}
-							});
-						};
-
-					$inlineLink.textContent = 'Show inline script (original)';
-					$inlineLink2.textContent = 'Show inline script (beautified)';
-					$inlineCode.textContent = script.code;
-					$inlineCode2.textContent = script.codeBeautified;
-					$inlineLink.setAttribute('href', '#');
-					$inlineLink2.setAttribute('href', '#');
-					$inlineCode.setAttribute('class', 'scrolling-code hidden');
-					$inlineCode2.setAttribute('class', 'scrolling-code hidden');
-					createClickListener($inlineLink, $inlineCode);
-					createClickListener($inlineLink2, $inlineCode2);
-
-					script.$div.appendChild($inlineLink);
-					script.$div.appendChild($inlineCode);
-					script.$div.appendChild(document.createElement('br'));
-					script.$div.appendChild($inlineLink2);
-					script.$div.appendChild($inlineCode2);
-				}
-
-				script.messages.forEach(function(m) {
-					var $result = document.createElement('p'),
-						$summary = document.createElement('div'),
-						$code = document.createElement('code');
-
-					$summary.textContent = m.line + ':' + m.column + ' ' + m.message;
-					$code.textContent = m.source.trim();
-					$code.setAttribute('class', 'scrolling-code');
-					$result.appendChild($summary);
-					$result.appendChild($code);
-					script.$div.appendChild($result);
-				});
-
 				if (script.messages.length === 0) {
 					var $p = document.createElement('p');
 					$p.textContent = 'No errors in this file.';
 					script.$div.appendChild($p);
+				} else {
+					var messagesSummary = {},
+						$resultsSummary = document.createElement('table'),
+						$resultsSummaryBody = document.createElement('tbody'),
+						$showResultsLink = document.createElement('a'),
+						$resultsDetail = document.createElement('div'),
+						key,
+						$row;
+
+					$resultsSummary.innerHTML = '<thead><tr><th>Rule</th><th>Count</th></tr></thead>';
+					$resultsSummary.appendChild($resultsSummaryBody);
+					$resultsSummary.setAttribute('class', 'results-summary');
+					$showResultsLink.textContent = 'Show full results';
+					$showResultsLink.setAttribute('href', '#');
+					$resultsDetail.setAttribute('class', 'results-detail hidden');
+					$showResultsLink.addEventListener('click', function(e) {
+						e.preventDefault();
+						if ($resultsDetail.getAttribute('class').indexOf('hidden') === -1) {
+							$resultsDetail.setAttribute('class', 'results-detail hidden');
+						} else {
+							$resultsDetail.setAttribute('class', 'results-detail');
+						}
+					});
+
+					script.messages.forEach(function(m) {
+						if (messagesSummary.hasOwnProperty(m.ruleId)) {
+							messagesSummary[m.ruleId] += 1;
+						} else {
+							messagesSummary[m.ruleId] = 1;
+						}
+
+						var $result = document.createElement('p'),
+							$summary = document.createElement('div'),
+							$code = document.createElement('code');
+
+						$summary.textContent = m.line + ':' + m.column + ' ' + m.message;
+						$code.textContent = m.source.trim();
+						$code.setAttribute('class', 'scrolling-code');
+						$result.appendChild($summary);
+						$result.appendChild($code);
+						$resultsDetail.appendChild($result);
+					});
+
+					for (key in messagesSummary) {
+						if (messagesSummary.hasOwnProperty(key)) {
+							$row = document.createElement('tr');
+							$row.innerHTML = `<td>${key}</td><td>${messagesSummary[key]}</td>`;
+							$resultsSummaryBody.appendChild($row);
+						}
+					}
+
+					script.$div.appendChild($resultsSummary);
+					script.$div.appendChild($showResultsLink);
+					script.$div.appendChild(document.createElement('br'));
+					script.$div.appendChild($resultsDetail);
 				}
+
+				var $sourceLink = document.createElement('a'),
+					$sourceLink2 = document.createElement('a'),
+					$sourceCode = document.createElement('code'),
+					$sourceCode2 = document.createElement('code'),
+					createClickListener = function($link, $code) {
+						$link.addEventListener('click', function(e) {
+							e.preventDefault();
+							if ($code.getAttribute('class').indexOf('hidden') === -1) {
+								$code.setAttribute('class', 'scrolling-code hidden');
+							} else {
+								$code.setAttribute('class', 'scrolling-code');
+							}
+						});
+					};
+
+				$sourceLink.textContent = 'Show source (original)';
+				$sourceLink2.textContent = 'Show source (beautified)';
+				$sourceCode.textContent = script.code;
+				$sourceCode2.textContent = script.codeBeautified;
+				$sourceLink.setAttribute('href', '#');
+				$sourceLink2.setAttribute('href', '#');
+				$sourceCode.setAttribute('class', 'scrolling-code hidden');
+				$sourceCode2.setAttribute('class', 'scrolling-code hidden');
+				createClickListener($sourceLink, $sourceCode);
+				createClickListener($sourceLink2, $sourceCode2);
+
+				script.$div.appendChild($sourceLink);
+				script.$div.appendChild($sourceCode);
+				script.$div.appendChild(document.createElement('br'));
+				script.$div.appendChild($sourceLink2);
+				script.$div.appendChild($sourceCode2);
 			};
 
 			scripts.forEach(function(script) {
@@ -137,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				$h2.textContent = script.file || 'Inline script';
 				$content.appendChild($h2);
 				var $div = document.createElement('div');
+				$div.setAttribute('class', 'results-container');
 				$div.textContent = (script.file ? 'Loading script...' : 'Waiting for Web Worker...');
 				$content.appendChild($div);
 				script.$div = $div;
