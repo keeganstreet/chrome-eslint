@@ -10,7 +10,13 @@
     "default_popup": "source/popup.html"
   },
 
+  "options_ui": {
+    "page": "source/options.html",
+    "chrome_style": true
+  },
+
   "permissions": [
+    "storage",
     "activeTab",
     "http://*/",
     "https://*/"

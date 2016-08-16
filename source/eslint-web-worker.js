@@ -20,26 +20,7 @@ var lint = function(data) {
 		var ast = espree.parse(data.code);
 		var codeBeautified = escodegen.generate(ast);
 
-		var messages = ESLint.verify(codeBeautified, {
-			env: {
-				browser: true,
-				es6: true,
-				commonjs: true,
-				amd: true,
-				jquery: true
-			},
-			globals: {
-				TLT: true,
-				require: true,
-				define: true
-			},
-			rules: {
-				'no-implicit-globals': 2,
-				'no-undef': 2,
-				// 'no-redeclare': 2,
-				// 'no-native-reassign': 2
-			}
-		}, { filename: data.file });
+		var messages = ESLint.verify(codeBeautified, data.config, { filename: data.file });
 
 		self.postMessage({
 			codeBeautified: codeBeautified,
