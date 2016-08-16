@@ -17,7 +17,7 @@ This extension is functional but not yet released to the Chrome Web Store. If yo
 1. Extension scans the page for JavaScript.
 2. External scripts are loaded. Inline scripts are read from the page.
 3. The scripts are beautified because it is hard to read the ESLint output for a minified script.
-4. Each script is linted with ESLint according to the rules in the extension options page.
+4. Each script is linted with ESLint according to the rules in the extension options.
 5. Results are displayed in the extension popup.
 
 ### Dependencies
