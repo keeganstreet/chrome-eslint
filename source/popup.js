@@ -24,16 +24,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 	chrome.storage.sync.get({
-		env: JSON.stringify(defaults.env),
-		globals: JSON.stringify(defaults.globals),
-		rules: JSON.stringify(defaults.rules)
-	}, function(_config) {
-		var config = {
-			env: JSON.parse(_config.env),
-			globals: JSON.parse(_config.globals),
-			rules: JSON.parse(_config.rules)
-		};
-
+		env: defaults.env,
+		globals: defaults.globals,
+		rules: defaults.rules
+	}, function(config) {
 		chrome.tabs.executeScript(null, {
 			file: 'source/get-scripts.js'
 		}, function(scriptResults) {

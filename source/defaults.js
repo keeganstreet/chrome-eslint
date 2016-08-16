@@ -12,6 +12,7 @@ var defaults = {
 	},
 	rules: {
 		'no-implicit-globals': 2,
-		'no-undef': 2
+		'no-undef': 2,
+		'no-global-assign': 2
 	}
 };

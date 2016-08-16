@@ -1,13 +1,27 @@
 var saveOptions = function() {
-	var env = document.getElementById('env').value;
-	var globals = document.getElementById('globals').value;
-	var rules = document.getElementById('rules').value;
+	var status = document.getElementById('status'),
+		env,
+		globals,
+		rules;
+
+	try {
+		env = JSON.parse(document.getElementById('env').value);
+		globals = JSON.parse(document.getElementById('globals').value);
+		rules = JSON.parse(document.getElementById('rules').value);
+	} catch(e) {
+		status.textContent = 'Error parsing input as JSON.';
+		setTimeout(function() {
+			status.textContent = '';
+		}, 750);
+		return;
+	}
+
 	chrome.storage.sync.set({
 		env: env,
 		globals: globals,
 		rules: rules
 	}, function() {
-		var status = document.getElementById('status');
+		restoreOptions();
 		status.textContent = 'Options saved.';
 		setTimeout(function() {
 			status.textContent = '';
@@ -17,13 +31,13 @@ var saveOptions = function() {
 
 var restoreOptions = function() {
 	chrome.storage.sync.get({
-		env: JSON.stringify(defaults.env, null, '  '),
-		globals: JSON.stringify(defaults.globals, null, '  '),
-		rules: JSON.stringify(defaults.rules, null, '  ')
+		env: defaults.env,
+		globals: defaults.globals,
+		rules: defaults.rules
 	}, function(config) {
-		document.getElementById('env').value = config.env;
-		document.getElementById('globals').value = config.globals;
-		document.getElementById('rules').value = config.rules;
+		document.getElementById('env').value = JSON.stringify(config.env, null, '  ');
+		document.getElementById('globals').value = JSON.stringify(config.globals, null, '  ');
+		document.getElementById('rules').value = JSON.stringify(config.rules, null, '  ');
 	});
 };
 
